@@ -1,0 +1,48 @@
+datasources:
+  default:
+    url: jdbc:postgresql://postgresql-headless:5432/database
+    driverClassName: org.postgresql.Driver
+    username: postgres
+    password: secret
+    schema-generate: CREATE_DROP
+    dialect: POSTGRES
+jpa.default.properties.hibernate.hbm2ddl.auto: update
+micronaut:
+  metrics:
+    export:
+      jmx:
+        enabled: true
+        step: PT1M
+      elastic:
+        enabled: true
+        step: PT1M
+    enabled: true
+  caches:
+    my-cache:
+      maximumSize: 20
+  security:
+    authentication: session
+    token:
+      jwt:
+        signatures:
+          secret:
+            generator:
+              secret: '"${JWT_GENERATOR_SIGNATURE_SECRET:pleaseChangeThisSecretForANewOne}"'
+#    oauth2:
+#      clients:
+#        default:
+#          client-id: ${OAUTH_CLIENT_ID}
+#          client-secret: ${OAUTH_CLIENT_SECRET}
+#          openid:
+#            issuer: ${OAUTH_ISSUER}
+tracing:
+  jaeger:
+    enabled: true
+    sampler:
+      probability: 0.1
+kafka.bootstrap.servers: kafka:9092
+
+endpoints:
+  all:
+    enabled: true
+    sensitive: false

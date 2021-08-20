@@ -1,0 +1,6 @@
+applicationType: default
+defaultPackage: com.example
+testFramework: junit
+sourceLanguage: kotlin
+buildTool: gradle
+features: [annotation-api, app-name, cache-ehcache, config-kubernetes, data, data-jpa, discovery-eureka, flyway, gradle, hamcrest, hibernate-validator, http-client, jdbc-hikari, jib, jmx, junit, kafka, kotlin, kotlin-application, kubernetes, logback, management, micrometer, micrometer-elastic, micrometer-jmx, postgres, readme, rxjava3, security, security-annotations, security-jwt, security-oauth2, security-session, shade, testcontainers, tomcat-server, tracing-jaeger, yaml]

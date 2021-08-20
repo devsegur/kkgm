@@ -1,0 +1,9 @@
+global:
+  postgresql:
+    existentSecret: secret
+    postgresqlDatabase: database
+  postgresl.endpoint:
+    cloudservice: false
+postgresqlUsername: postgres
+postgresqlPassword: secret
+postgresqlDatabase: database

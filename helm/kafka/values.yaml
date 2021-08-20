@@ -1,0 +1,10 @@
+metrics.kafka.enabled: true
+volumePermissions.enabled: true
+externalAccess:
+  enabled: false
+  autoDiscovery.enabled: true
+  service:
+    type: LoadBalancer
+    port: 9094
+serviceAccount.create: true
+rbac.create: true
