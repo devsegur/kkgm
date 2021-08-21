@@ -1,6 +1,5 @@
-
 kubernetes-install:
-	sudo chown evertonfs /var/run/docker.sock
+	sudo chown ${shell whoami} /var/run/docker.sock
 	sudo curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64
 	sudo chmod +x ./kind
 	sudo mv ./kind /usr/local/bin/kind
@@ -12,7 +11,7 @@ kubernetes-install:
 	zsh
 
 kubernetes-expose-services:
-	sudo ip route add 172.19.0.0/16 via 172.18.0.1
+	sudo ip route add 172.19.0.0/16 via ${shell ip a s docker0 | egrep -o 'inet [0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | cut -d' ' -f2}
 
 helm-install:
 	curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
