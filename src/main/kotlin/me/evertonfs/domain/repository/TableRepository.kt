@@ -6,8 +6,8 @@ import me.evertonfs.application.entity.TableEntity
 import me.evertonfs.domain.model.Table
 
 interface TableRepository {
-    fun save(entity: TableEntity)
+    fun save(entity: Table): Table?
 
-    fun findAll(): MutableList<TableEntity>
+    fun findAllImpl(): List<Table?>
 }
 

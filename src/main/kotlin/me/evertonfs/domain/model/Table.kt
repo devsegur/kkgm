@@ -1,5 +1,3 @@
 package me.evertonfs.domain.model
 
-open class Table(open var id: Long?,open var name: String?, open var reference: List<Column>?) {
-    constructor() : this(null, "", emptyList())
-}
+data class Table( val id: Long?, val name: String?, val reference: List<Column>?)

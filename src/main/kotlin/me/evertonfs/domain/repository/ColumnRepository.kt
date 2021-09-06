@@ -5,7 +5,7 @@ import me.evertonfs.domain.model.Column
 
 interface ColumnRepository {
 
-    fun findAll(): MutableList<ColumnEntity>
+    fun findAllImpl(): List<Column>
 
-    fun save(column: ColumnEntity): ColumnEntity
+    fun save(column: Column): Column
 }
