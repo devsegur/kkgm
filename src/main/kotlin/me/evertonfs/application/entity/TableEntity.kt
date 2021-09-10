@@ -3,22 +3,16 @@ package me.evertonfs.application.entity
 import org.hibernate.Hibernate
 import javax.persistence.*
 import javax.persistence.GenerationType.IDENTITY
-import kotlin.jvm.Transient
-import kotlin.lazy as lazy1
 
 @Entity
 @javax.persistence.Table(name = "Tabela")
-open class TableEntity(id: Long?, name: String?, reference: List<ColumnEntity>) {
-
-    @Id
-    @GeneratedValue(strategy = IDENTITY)
-    var id: Long? = id
-
-    @javax.persistence.Column
-    val name: String? = name
+open class TableEntity(
+    @Id @GeneratedValue(strategy = IDENTITY) open val id: Long?,
+    @javax.persistence.Column open val name: String?, reference: List<ColumnEntity>,
+) {
 
     @OneToMany(fetch = FetchType.EAGER, orphanRemoval = false)
-    var reference: List<ColumnEntity>? = reference
+    open var reference: List<ColumnEntity>? = reference
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
