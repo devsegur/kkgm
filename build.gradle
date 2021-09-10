@@ -21,6 +21,7 @@ repositories {
 }
 
 dependencies {
+    implementation 'org.junit.jupiter:junit-jupiter:5.7.0'
     kaptTest 'io.micronaut:micronaut-inject-java:2.5.11'
     testImplementation "io.micronaut.test:micronaut-test-kotest:2.3.7"
     testImplementation 'io.mockk:mockk:1.12.0'

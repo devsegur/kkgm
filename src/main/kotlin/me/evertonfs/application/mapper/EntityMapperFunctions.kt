@@ -5,11 +5,13 @@ import me.evertonfs.application.entity.TableEntity
 import me.evertonfs.domain.model.Column
 import me.evertonfs.domain.model.Table
 
-fun tableMapper(table: Table?): Pair<Table?, TableEntity> {
-    return table to TableEntity(
-        id = table?.id,
-        name = table?.name,
-        reference = table?.reference?.map { column -> columnWithoutTableEntityMapper(column).second })
+fun tableMapper(table: Table?): Pair<Table?, TableEntity?> {
+    return table to table?.reference?.map { column -> columnWithoutTableEntityMapper(column).second }?.let {
+        TableEntity(
+            id = table.id,
+            name = table.name,
+            reference = it)
+    }
 }
 
 fun tableMapper(table: TableEntity?): Pair<TableEntity?, Table?> {
