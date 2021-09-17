@@ -26,9 +26,8 @@ class RestController(var service: TableService) {
         return service.saveTable(table)
     }
 
-    @Post(value = "save/all")
-    fun saveAll(tables: Flux<Table>): Flux<Table> {
+    @Post(value = "save/all", consumes = [MediaType.APPLICATION_JSON])
+    fun saveAll(@Body tables: MutableList<Table>): Flux<Table> {
         return service.saveAllTables(tables)
     }
-
 }

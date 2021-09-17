@@ -56,3 +56,9 @@ build-create-deploy:
 	make build-application;
 	make create-image;
 	make deploy-image;
+
+create-table:
+	curl localhost:8080/save --header "Content-Type:application/json" -X POST --data-raw '{"id": "", "name": "created from makefile", "reference": []}' -vvv
+
+create-tables:
+	curl localhost:8080/save/all --header "Content-Type:application/json" -X POST -d '[{"id": "", "name": "created from makefile0", "reference": []},{"id": "", "name": "created from makefile1", "reference": []},{"id": "", "name": "created from makefile2", "reference": []}]' -vvv

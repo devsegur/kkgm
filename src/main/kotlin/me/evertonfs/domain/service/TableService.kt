@@ -15,10 +15,9 @@ class TableService(private val repository: TableRepository, private val repo: Co
         return repository.save(table)!!
     }
 
-    fun saveAllTables(tables: Flux<Table>): Flux<Table> {
-        return tables.doOnEach { repository.save(it.get()!!) }
+    fun saveAllTables(tables: List<Table>): Flux<Table> {
+        return Flux.fromIterable(tables.map { repository.save(it) }.toCollection(arrayListOf()))
     }
-
 
 
 }
