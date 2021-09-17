@@ -4,6 +4,7 @@ kubernetes-install:
 	sudo chmod +x ./kind
 	sudo mv ./kind /usr/local/bin/kind
 	kind create cluster
+	kubectl apply -f ./dashboard.yaml
 	kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/master/manifests/namespace.yaml
 	kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
 	kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/master/manifests/metallb.yaml
@@ -13,6 +14,9 @@ kubernetes-install:
 
 kubernetes-expose-services:
 	sudo ip route add 172.19.0.0/16 via ${shell ip a s docker0 | egrep -o 'inet [0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | cut -d' ' -f2}
+
+kubernetes-dashboard:
+	kubectl get secret -n kubernetes-dashboard $(kubectl get serviceaccount admin-user -n kubernetes-dashboard -o jsonpath="{.secrets[0].name}") -o jsonpath="{.data.token}" | base64 --decode
 
 helm-install:
 	curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
@@ -58,7 +62,7 @@ build-create-deploy:
 	make deploy-image;
 
 create-table:
-	curl localhost:8080/save --header "Content-Type:application/json" -X POST --data-raw '{"id": "", "name": "created from makefile", "reference": []}' -vvv
+	curl kubernets:8080/save --header "Content-Type:application/json" -X POST --data-raw '{"id": "", "name": "created from makefile", "reference": []}' -vvv
 
 create-tables:
-	curl localhost:8080/save/all --header "Content-Type:application/json" -X POST -d '[{"id": "", "name": "created from makefile0", "reference": []},{"id": "", "name": "created from makefile1", "reference": []},{"id": "", "name": "created from makefile2", "reference": []}]' -vvv
+	curl kubernets:8080/save/all --header "Content-Type:application/json" -X POST -d '[{"id": "", "name": "created from makefile0", "reference": []},{"id": "", "name": "created from makefile1", "reference": []},{"id": "", "name": "created from makefile2", "reference": []}]' -vvv
