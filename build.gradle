@@ -10,7 +10,7 @@ plugins {
 }
 
 application {
-    mainClass.set("me.evertonfs.Application")
+    mainClass.set("me.evertonfs.ApplicationKt")
 }
 
 group = "me.evertonfs"
