@@ -45,9 +45,11 @@ kafka-restart:
 	make kafka-helm-install;
 
 prometheus-helm-install:
+	kubectl kustomize | kubectl apply -f -
 	helm install prometheus-stack -f helm/prometheus-operator/values.yaml prometheus-community/kube-prometheus-stack
 
 prometheus-helm-upgrade:
+	kubectl kustomize | kubectl apply -f -
 	helm upgrade prometheus-stack -f helm/prometheus-operator/values.yaml prometheus-community/kube-prometheus-stack
 
 prometheus-helm-rm:
@@ -83,7 +85,7 @@ build-create-deploy:
 	make deploy-image;
 
 get-secrets:
-	 kubectl get secret prometheus-stack-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo " - Grafana admin passwd
+	 kubectl get secret prometheus-stack-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo " - Grafana admin passwd"
 
 create-table:
 	curl kubernets:8080/save --header "Content-Type:application/json" -X POST --data-raw '{"id": "", "name": "created from makefile", "reference": []}' -vvv

@@ -1,6 +1,3 @@
-grafana:
-  service:
-    type: LoadBalancer
 alertmanager:
   service:
     type: LoadBalancer
@@ -13,3 +10,21 @@ prometheus:
   thanosService:
     service:
       type: LoadBalancer
+grafana:
+  service:
+    type: LoadBalancer
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+        - name: default
+          orgId: 1
+          folder:
+          type: file
+          disableDeletion: true
+          editable: false
+          options:
+            path: /var/lib/grafana/dashboards/default
+
+  dashboardsConfigMaps:
+    default: jvm-application-grafana-94mf8hkh4h

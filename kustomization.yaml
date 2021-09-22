@@ -1,0 +1,4 @@
+configMapGenerator:
+        - name: jvm-application-grafana
+          files:
+                  - helm/prometheus-operator/grafana/dashboards/jvm_application.json
