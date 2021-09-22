@@ -1,22 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: "kotlin-demo-application"
+  name: kotlin-demo-application
+  labels:
+    app: kotlin-demo-application
 spec:
   selector:
     matchLabels:
-      app: "kotlin-demo-application"
+      app: kotlin-demo-application
   template:
     metadata:
       labels:
-        app: "kotlin-demo-application"
+        app: kotlin-demo-application
     spec:
       containers:
-        - name: "kotlin-demo-application"
+        - name: kotlin-demo-container
           image: "kotlin-project:1.0-SNAPSHOT"
           imagePullPolicy: Never
           ports:
-            - name: http
+            - name: web
               containerPort: 8080
           readinessProbe:
             httpGet:
@@ -35,12 +37,30 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: "kotlin-demo-service"
+  name: kotlin-demo-service
+  labels:
+    app: kotlin-demo-application
 spec:
   selector:
-    app: "kotlin-demo-application"
+    app: kotlin-demo-application
   type: LoadBalancer
   ports:
-    - protocol: "TCP"
+    - name: web
+      protocol: "TCP"
       port: 8080
       targetPort: 8080
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: kotlin-demo-application
+    release: prometheus-stack
+  name: kotlin-project
+spec:
+  endpoints:
+  - port: web
+    path: /prometheus
+  selector:
+    matchLabels: 
+      app: kotlin-demo-application

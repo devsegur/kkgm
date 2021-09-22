@@ -38,12 +38,11 @@ dependencies {
     implementation("io.micronaut.data:micronaut-data-hibernate-jpa:2.5.0")
 //    implementation("io.micronaut.discovery:micronaut-discovery-client")
     implementation("io.micronaut.flyway:micronaut-flyway:4.0.0")
-    implementation("io.micronaut.jmx:micronaut-jmx:2.1.0")
     implementation("io.micronaut.kotlin:micronaut-kotlin-runtime:2.3.1")
 //    implementation("io.micronaut.kubernetes:micronaut-kubernetes-discovery-client")
+    implementation "io.micronaut.configuration:micronaut-micrometer-core:1.3.1"
+    implementation "io.micronaut.configuration:micronaut-micrometer-registry-prometheus:1.3.1"
     implementation("io.micronaut.micrometer:micronaut-micrometer-core:3.4.1")
-//    implementation("io.micronaut.micrometer:micronaut-micrometer-registry-elastic")
-    implementation("io.micronaut.micrometer:micronaut-micrometer-registry-jmx:3.4.1")
     implementation("io.micronaut.rxjava3:micronaut-rxjava3:1.1.2")
     implementation("io.micronaut.security:micronaut-security:2.5.0")
     implementation("io.micronaut.security:micronaut-security-jwt:2.5.0")

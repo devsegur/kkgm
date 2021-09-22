@@ -1,0 +1,15 @@
+grafana:
+  service:
+    type: LoadBalancer
+alertmanager:
+  service:
+    type: LoadBalancer
+prometheusOperator:
+  service:
+    type: LoadBalancer
+prometheus:
+  service:
+    type: LoadBalancer
+  thanosService:
+    service:
+      type: LoadBalancer

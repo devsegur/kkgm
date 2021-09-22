@@ -10,12 +10,10 @@ jpa.default.properties.hibernate.hbm2ddl.auto: update
 micronaut:
   metrics:
     export:
-      jmx:
+      prometheus:
         enabled: true
         step: PT1M
-      elastic:
-        enabled: true
-        step: PT1M
+        descriptions: true
     enabled: true
   caches:
     my-cache:

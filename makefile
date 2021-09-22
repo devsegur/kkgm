@@ -20,10 +20,9 @@ kubernetes-dashboard:
 
 helm-install:
 	curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
-	zsh
-
-postgres-helm-add:
+	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 	helm repo add bitnami https://charts.bitnami.com/bitnami
+	zsh
 
 postgres-helm-install:
 	helm install postgresql -f helm/postgresql/values.yaml bitnami/postgresql
@@ -45,6 +44,28 @@ kafka-restart:
 	make kafka-rm;
 	make kafka-helm-install;
 
+prometheus-helm-install:
+	helm install prometheus-stack -f helm/prometheus-operator/values.yaml prometheus-community/kube-prometheus-stack
+
+prometheus-helm-upgrade:
+	helm upgrade prometheus-stack -f helm/prometheus-operator/values.yaml prometheus-community/kube-prometheus-stack
+
+prometheus-helm-rm:
+	helm uninstall prometheus-stack
+	kubectl delete crd alertmanagerconfigs.monitoring.coreos.com
+	kubectl delete crd alertmanagers.monitoring.coreos.com
+	kubectl delete crd podmonitors.monitoring.coreos.com
+	kubectl delete crd probes.monitoring.coreos.com
+	kubectl delete crd prometheuses.monitoring.coreos.com
+	kubectl delete crd prometheusrules.monitoring.coreos.com
+	kubectl delete crd servicemonitors.monitoring.coreos.com
+	kubectl delete crd thanosrulers.monitoring.coreos.com
+
+helm-instalations:
+	make postgres-helm-install
+	make kafka-helm-install
+	make prometheus-helm-install
+
 build-application:
 	./gradlew clean build --continue --parallel
 
@@ -60,6 +81,9 @@ build-create-deploy:
 	make build-application;
 	make create-image;
 	make deploy-image;
+
+get-secrets:
+	 kubectl get secret prometheus-stack-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo " - Grafana admin passwd
 
 create-table:
 	curl kubernets:8080/save --header "Content-Type:application/json" -X POST --data-raw '{"id": "", "name": "created from makefile", "reference": []}' -vvv
