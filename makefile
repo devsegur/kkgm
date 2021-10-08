@@ -24,6 +24,27 @@ helm-install:
 	helm repo add bitnami https://charts.bitnami.com/bitnami
 	zsh
 
+istio-install:
+	curl -L https://istio.io/downloadIstio | sh -
+	sudo mv istio*/bin/istioctl /usr/local/bin/
+	rm -rf istio*
+	istioctl install -y
+
+istio-helm-install:
+	kubectl create namespace istio-system
+	helm install istio-base manifests/charts/base -n istio-system
+	helm install istiod manifests/charts/istio-control/istio-discovery -n istio-system
+	helm install istio-ingress manifests/charts/gateways/istio-ingress -n istio-system
+	helm install istio-egress manifests/charts/gateways/istio-egress -n istio-system
+	kubectl get pods -n istio-system
+
+istio-helm-rm:
+	helm delete istio-egress -n istio-system
+	helm delete istio-ingress -n istio-system
+	helm delete istiod -n istio-system
+	helm delete istio-base -n istio-system
+	kubectl delete namespace istio-system
+
 postgres-helm-install:
 	helm install postgresql -f helm/postgresql/values.yaml bitnami/postgresql
 

@@ -1,38 +1,218 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kotlin-demo-application
+  creationTimestamp: null
   labels:
     app: kotlin-demo-application
+  name: kotlin-demo-application
 spec:
   selector:
     matchLabels:
       app: kotlin-demo-application
+  strategy: {}
   template:
     metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: kotlin-demo-container
+        kubectl.kubernetes.io/default-logs-container: kotlin-demo-container
+        prometheus.io/path: /stats/prometheus
+        prometheus.io/port: "15020"
+        prometheus.io/scrape: "true"
+        sidecar.istio.io/status: '{"initContainers":["istio-init"],"containers":["istio-proxy"],"volumes":["istio-envoy","istio-data","istio-podinfo","istio-token","istiod-ca-cert"],"imagePullSecrets":null,"revision":"default"}'
+      creationTimestamp: null
       labels:
         app: kotlin-demo-application
+        security.istio.io/tlsMode: istio
+        service.istio.io/canonical-name: kotlin-demo-application
+        service.istio.io/canonical-revision: latest
     spec:
       containers:
-        - name: kotlin-demo-container
-          image: "kotlin-project:1.0-SNAPSHOT"
-          imagePullPolicy: Never
-          ports:
-            - name: web
-              containerPort: 8080
-          readinessProbe:
-            httpGet:
-              path: /health/readiness
-              port: 8080
-            initialDelaySeconds: 5
-            timeoutSeconds: 3
-          livenessProbe:
-            httpGet:
-              path: /health/liveness
-              port: 8080
-            initialDelaySeconds: 5
-            timeoutSeconds: 3
-            failureThreshold: 10
+      - image: kotlin-project:1.0-SNAPSHOT
+        imagePullPolicy: Never
+        livenessProbe:
+          failureThreshold: 10
+          httpGet:
+            path: /app-health/kotlin-demo-container/livez
+            port: 15020
+          initialDelaySeconds: 5
+          timeoutSeconds: 3
+        name: kotlin-demo-container
+        ports:
+        - containerPort: 8080
+          name: web
+        readinessProbe:
+          httpGet:
+            path: /app-health/kotlin-demo-container/readyz
+            port: 15020
+          initialDelaySeconds: 5
+          timeoutSeconds: 3
+        resources: {}
+      - args:
+        - proxy
+        - sidecar
+        - --domain
+        - $(POD_NAMESPACE).svc.cluster.local
+        - --proxyLogLevel=warning
+        - --proxyComponentLogLevel=misc:error
+        - --log_output_level=default:info
+        - --concurrency
+        - "2"
+        env:
+        - name: JWT_POLICY
+          value: third-party-jwt
+        - name: PILOT_CERT_PROVIDER
+          value: istiod
+        - name: CA_ADDR
+          value: istiod.istio-system.svc:15012
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: INSTANCE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: SERVICE_ACCOUNT
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.serviceAccountName
+        - name: HOST_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: PROXY_CONFIG
+          value: |
+            {}
+        - name: ISTIO_META_POD_PORTS
+          value: |-
+            [
+                {"name":"web","containerPort":8080}
+            ]
+        - name: ISTIO_META_APP_CONTAINERS
+          value: kotlin-demo-container
+        - name: ISTIO_META_CLUSTER_ID
+          value: Kubernetes
+        - name: ISTIO_META_INTERCEPTION_MODE
+          value: REDIRECT
+        - name: ISTIO_META_MESH_ID
+          value: cluster.local
+        - name: TRUST_DOMAIN
+          value: cluster.local
+        - name: ISTIO_KUBE_APP_PROBERS
+          value: '{"/app-health/kotlin-demo-container/livez":{"httpGet":{"path":"/health/liveness","port":8080},"timeoutSeconds":3},"/app-health/kotlin-demo-container/readyz":{"httpGet":{"path":"/health/readiness","port":8080},"timeoutSeconds":3}}'
+        image: docker.io/istio/proxyv2:1.11.2
+        name: istio-proxy
+        ports:
+        - containerPort: 15090
+          name: http-envoy-prom
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 30
+          httpGet:
+            path: /healthz/ready
+            port: 15021
+          initialDelaySeconds: 1
+          periodSeconds: 2
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: "2"
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 1337
+          runAsNonRoot: true
+          runAsUser: 1337
+        volumeMounts:
+        - mountPath: /var/run/secrets/istio
+          name: istiod-ca-cert
+        - mountPath: /var/lib/istio/data
+          name: istio-data
+        - mountPath: /etc/istio/proxy
+          name: istio-envoy
+        - mountPath: /var/run/secrets/tokens
+          name: istio-token
+        - mountPath: /etc/istio/pod
+          name: istio-podinfo
+      initContainers:
+      - args:
+        - istio-iptables
+        - -p
+        - "15001"
+        - -z
+        - "15006"
+        - -u
+        - "1337"
+        - -m
+        - REDIRECT
+        - -i
+        - '*'
+        - -x
+        - ""
+        - -b
+        - '*'
+        - -d
+        - 15090,15021,15020
+        image: docker.io/istio/proxyv2:1.11.2
+        name: istio-init
+        resources:
+          limits:
+            cpu: "2"
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            add:
+            - NET_ADMIN
+            - NET_RAW
+            drop:
+            - ALL
+          privileged: false
+          readOnlyRootFilesystem: false
+          runAsGroup: 0
+          runAsNonRoot: false
+          runAsUser: 0
+      volumes:
+      - emptyDir:
+          medium: Memory
+        name: istio-envoy
+      - emptyDir: {}
+        name: istio-data
+      - downwardAPI:
+          items:
+          - fieldRef:
+              fieldPath: metadata.labels
+            path: labels
+          - fieldRef:
+              fieldPath: metadata.annotations
+            path: annotations
+        name: istio-podinfo
+      - name: istio-token
+        projected:
+          sources:
+          - serviceAccountToken:
+              audience: istio-ca
+              expirationSeconds: 43200
+              path: istio-token
+      - configMap:
+          name: istio-ca-root-cert
+        name: istiod-ca-cert
+status: {}
 ---
 apiVersion: v1
 kind: Service
@@ -64,3 +244,22 @@ spec:
   selector:
     matchLabels: 
       app: kotlin-demo-application
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: prometheus-oper-istio-controlplane
+  labels:
+    release: prometheus
+spec:
+  jobLabel: istio
+  selector:
+    matchExpressions:
+      - {key: istio, operator: In, values: [mixer,pilot,galley,citadel,sidecar-injector]}
+  namespaceSelector:
+    any: true
+  endpoints:
+  - port: http-monitoring
+    interval: 15s
+  - port: http-policy-monitoring
+    interval: 15s
