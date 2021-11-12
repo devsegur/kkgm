@@ -21,11 +21,11 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.junit.jupiter:junit-jupiter:5.7.0'
-    kaptTest 'io.micronaut:micronaut-inject-java:2.5.11'
+    implementation "org.junit.jupiter:junit-jupiter:5.7.0"
+    kaptTest "io.micronaut:micronaut-inject-java:2.5.11"
     testImplementation "io.micronaut.test:micronaut-test-kotest:2.3.7"
-    testImplementation 'io.mockk:mockk:1.12.0'
-    testImplementation 'io.kotest:kotest-runner-junit5-jvm:4.6.1'
+    testImplementation "io.mockk:mockk:1.12.0"
+    testImplementation "io.kotest:kotest-runner-junit5-jvm:4.6.1"
     implementation "org.springframework.boot:spring-boot-starter-webflux:2.5.3"
     kapt("io.micronaut.data:micronaut-data-processor:2.5.0")
     kapt("io.micronaut.security:micronaut-security-annotations:2.5.0")
