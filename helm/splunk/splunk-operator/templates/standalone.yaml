@@ -1,0 +1,28 @@
+---
+apiVersion: enterprise.splunk.com/v2
+kind: Standalone
+metadata:
+  name: s1
+  labels:
+    app: SplunkStandAlone
+    type: Splunk
+spec:
+  replicas: 1
+  extraEnv:
+    - name: SPLUNK_PASSWORD
+      value: "batataquente"
+    - name: SPLUNK_START_ARGS
+      value: "--accept-license"
+  serviceTemplate:
+    status:
+      loadBalancer:
+        ingress:
+          - ip: 172.19.255.207
+    spec:
+      type: LoadBalancer
+  resources:
+    requests:
+      cpu: "1"
+    limits:
+      memory: "1Gi"
+      cpu: "2"

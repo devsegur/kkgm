@@ -84,6 +84,22 @@ prometheus-helm-rm:
 	kubectl delete crd servicemonitors.monitoring.coreos.com
 	kubectl delete crd thanosrulers.monitoring.coreos.com
 
+splunk-helm-install:
+	helm install splunk-connector -f helm/splunk-connector/values.yaml splunk/splunk-connect-for-kubernetes
+	helm package helm/splunk/splunk-operator -d helm/splunk/splunk-operator/
+	kubectl apply -f helm/splunk/custom-resources.yaml
+	helm install splunkoperator helm/splunk/splunk-operator/splunk-operator-0.1.0.tgz -f helm/splunk/splunk-operator/values.yaml
+	kubectl get secret splunk-s1-standalone-secret-v1 -o jsonpath='{.data.password}' | base64 -d
+
+splunk-helm-uninstall:
+	helm uninstall splunk-connector
+	helm uninstall splunkoperator
+	kubectl delete -f helm/splunk/custom-resources.yaml
+
+splunk-helm-reinstall:
+	make splunk-helm-uninstall
+	make splunk-helm-install
+
 helm-instalations:
 	make postgres-helm-install
 	make kafka-helm-install
